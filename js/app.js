@@ -19,6 +19,8 @@ class VehiculoApp {
         
         // Main screen
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+        document.getElementById('syncBtn').addEventListener('click', () => showModal('syncModal'));
+        document.getElementById('exportBtn').addEventListener('click', () => DataSync.downloadUserData());
         
         // Detail screen
         document.getElementById('logoutBtnDetail').addEventListener('click', () => this.logout());
@@ -36,6 +38,12 @@ class VehiculoApp {
         document.getElementById('addVehiculoForm').addEventListener('submit', (e) => this.handleAddVehiculo(e));
         document.getElementById('addSharedForm').addEventListener('submit', (e) => this.handleAddSharedVehiculo(e));
         document.getElementById('confirmDateBtn').addEventListener('click', () => this.handleDateSelection());
+        
+        // Sync functionality
+        document.getElementById('generateSyncUrlBtn').addEventListener('click', () => this.generateSyncUrl());
+        document.getElementById('importSyncBtn').addEventListener('click', () => this.importFromFile());
+        document.getElementById('importCodeBtn').addEventListener('click', () => showModal('importCodeModal'));
+        document.getElementById('importCodeForm').addEventListener('submit', (e) => this.handleImportCode(e));
         
         // Modal overlay
         document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -402,6 +410,75 @@ class VehiculoApp {
             }
         } catch (error) {
             showToast('Error al compartir vehículo', 'error');
+        }
+    }
+
+    // Sync functionality
+    generateSyncUrl() {
+        try {
+            DataSync.generateSyncUrl();
+            closeModal();
+            showToast('URL de sincronización generada', 'success');
+        } catch (error) {
+            showToast('Error al generar URL de sincronización', 'error');
+        }
+    }
+
+    importFromFile() {
+        // Crear input file temporal
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const success = DataSync.importUserData(e.target.result);
+                    if (success) {
+                        closeModal();
+                        showToast('Datos importados exitosamente', 'success');
+                        // Recargar la aplicación
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    }
+                } catch (error) {
+                    showToast('Error al importar archivo', 'error');
+                }
+            };
+            reader.readAsText(file);
+        };
+        
+        input.click();
+        closeModal();
+    }
+
+    handleImportCode(e) {
+        e.preventDefault();
+        
+        const code = document.getElementById('syncCodeInput').value.trim();
+        
+        if (!code) {
+            showToast('Ingresa el código de sincronización', 'error');
+            return;
+        }
+        
+        try {
+            const success = DataSync.importFromCode(code);
+            if (success) {
+                closeModal();
+                showToast('Datos importados exitosamente', 'success');
+                // Recargar la aplicación
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        } catch (error) {
+            showToast('Error al importar código', 'error');
         }
     }
 }
