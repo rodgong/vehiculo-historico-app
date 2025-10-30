@@ -13,6 +13,11 @@ class GitHubDatabase {
 
     // Inicializar
     async init(token = null) {
+        // Intentar obtener token desde localStorage si no se proporciona
+        if (!token) {
+            token = localStorage.getItem('github_token');
+        }
+        
         this.token = token;
         this.readOnly = !token;
         this.initialized = true;
@@ -21,6 +26,29 @@ class GitHubDatabase {
             '📖 GitHub Database en modo solo lectura' : 
             '✅ GitHub Database con permisos de escritura'
         );
+    }
+
+    // Configurar token de GitHub
+    setToken(token) {
+        this.token = token;
+        this.readOnly = !token;
+        
+        if (token) {
+            localStorage.setItem('github_token', token);
+            console.log('✅ Token de GitHub configurado - Modo escritura activado');
+        } else {
+            localStorage.removeItem('github_token');
+            console.log('📖 Token removido - Modo solo lectura');
+        }
+    }
+
+    // Obtener estado del token
+    getTokenStatus() {
+        return {
+            hasToken: !!this.token,
+            readOnly: this.readOnly,
+            tokenPreview: this.token ? `${this.token.substring(0, 8)}...` : null
+        };
     }
 
     // Obtener datos del archivo JSON en GitHub

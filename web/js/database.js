@@ -33,18 +33,22 @@ class VehiculoDatabase {
     }
 
     async registrarUsuario(nombre, email, password) {
-        // Usar GitHub Database para registro
-        if (this.githubDB && this.githubDB.initialized) {
-            const { hash, salt } = await SecurityUtils.hashPasswordWithSalt(password);
-            return await this.githubDB.registrarUsuario(nombre, email, hash, salt);
+        // Primero verificar en localStorage si el usuario ya existe
+        const usuariosLocales = this.getUsuarios();
+        if (usuariosLocales.find(u => u.email === email)) {
+            return null;
         }
         
-        // Fallback a localStorage
-        const usuarios = this.getUsuarios();
-        
-        // Verificar si el email ya existe
-        if (usuarios.find(u => u.email === email)) {
-            return null;
+        // También verificar en GitHub Database si está disponible
+        if (this.githubDB && this.githubDB.initialized) {
+            try {
+                const githubData = await this.githubDB.getData();
+                if (githubData.usuarios.find(u => u.email === email)) {
+                    return null; // Usuario ya existe en GitHub
+                }
+            } catch (error) {
+                console.log('No se pudo verificar en GitHub Database:', error);
+            }
         }
 
         // Hash de la contraseña con salt
@@ -59,8 +63,20 @@ class VehiculoDatabase {
             fechaRegistro: new Date().toISOString()
         };
 
-        usuarios.push(nuevoUsuario);
-        this.saveUsuarios(usuarios);
+        // SIEMPRE registrar en localStorage primero
+        usuariosLocales.push(nuevoUsuario);
+        this.saveUsuarios(usuariosLocales);
+        console.log('✅ Usuario registrado en localStorage:', nombre);
+
+        // Intentar sincronizar con GitHub Database si es posible
+        if (this.githubDB && this.githubDB.initialized && !this.githubDB.readOnly) {
+            try {
+                await this.githubDB.registrarUsuario(nombre, email, hash, salt);
+                console.log('✅ Usuario sincronizado con GitHub Database:', nombre);
+            } catch (error) {
+                console.log('⚠️ No se pudo sincronizar con GitHub Database:', error);
+            }
+        }
         
         // Retornar usuario sin datos sensibles
         const { passwordHash, passwordSalt, ...userSafe } = nuevoUsuario;
@@ -69,18 +85,7 @@ class VehiculoDatabase {
 
     async login(email, password) {
         try {
-            // Usar GitHub Database para login si está disponible
-            if (this.githubDB && this.githubDB.initialized) {
-                console.log('🌐 Intentando login con GitHub Database...');
-                const result = await this.githubDB.login(email, password);
-                if (result) {
-                    console.log('🎉 Login exitoso con GitHub Database');
-                    return result;
-                }
-                console.log('⚠️ Login fallido en GitHub, intentando local...');
-            }
-
-            // Fallback a localStorage
+            // PRIMERO intentar login con localStorage (más rápido y confiable)
             const usuarios = this.getUsuarios();
             console.log('🔍 Intento de login local para:', email);
             console.log('📊 Total usuarios locales:', usuarios.length);
@@ -307,27 +312,75 @@ class VehiculoDatabase {
             .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     }
 
-    agregarDiaUso(vehiculoId, usuarioId, fecha) {
+    async agregarDiaUso(vehiculoId, usuarioId, fecha) {
         const diasUso = this.getDiasUso();
         const fechaStr = fecha.toISOString().split('T')[0];
         
-        // Verificar si ya existe un día de uso para esta fecha
+        console.log('🔍 DEBUG agregarDiaUso:', {
+            vehiculoId,
+            vehiculoIdType: typeof vehiculoId,
+            usuarioId,
+            usuarioIdType: typeof usuarioId,
+            fechaStr,
+            totalDiasUso: diasUso.length,
+            diasParaEsteVehiculo: diasUso.filter(d => d.vehiculoId === vehiculoId).length,
+            todosLosDiasUso: diasUso.map(d => ({
+                id: d.id,
+                vehiculoId: d.vehiculoId,
+                vehiculoIdType: typeof d.vehiculoId,
+                usuarioId: d.usuarioId,
+                fecha: d.fecha.split('T')[0],
+                nombreUsuario: d.nombreUsuario
+            }))
+        });
+        
+        // Verificar si ya existe un día de uso para este vehículo en esta fecha (por cualquier usuario)
         const existente = diasUso.find(d => 
             d.vehiculoId === vehiculoId && 
             d.fecha.split('T')[0] === fechaStr
         );
         
         if (existente) {
-            return false; // Ya existe
+            console.log('❌ Día existente encontrado:', {
+                existenteId: existente.id,
+                existenteUsuarioId: existente.usuarioId,
+                existenteNombreUsuario: existente.nombreUsuario,
+                existenteFecha: existente.fecha,
+                usuarioActual: usuarioId
+            });
+            
+            // Si existe, verificar si es del mismo usuario
+            if (existente.usuarioId === usuarioId) {
+                return { error: 'duplicate', message: 'Ya registraste este día' };
+            } else {
+                return { error: 'occupied', message: `Este día ya fue usado por ${existente.nombreUsuario}` };
+            }
         }
+        
+        console.log('✅ No hay conflictos, agregando día de uso');
 
-        // Obtener el nombre del usuario por ID en lugar de getCurrentUser
-        const usuarios = this.getUsuarios();
-        const usuario = usuarios.find(u => u.id === usuarioId);
+        // Obtener el nombre del usuario por ID - buscar en ambas bases de datos
+        let usuario = null;
+        
+        // Primero buscar en localStorage
+        const usuariosLocales = this.getUsuarios();
+        usuario = usuariosLocales.find(u => u.id === usuarioId);
+        
+        // Si no se encuentra localmente y tenemos GitHub DB, buscar ahí
+        if (!usuario && this.githubDB && this.githubDB.initialized) {
+            try {
+                const githubData = await this.githubDB.getData();
+                usuario = githubData.usuarios.find(u => u.id === usuarioId);
+                console.log('👤 Usuario encontrado en GitHub Database:', usuario?.nombre);
+            } catch (error) {
+                console.error('Error buscando usuario en GitHub:', error);
+            }
+        }
         
         if (!usuario) {
-            console.error('Usuario no encontrado:', usuarioId);
-            return false;
+            console.error('Usuario no encontrado en ninguna base de datos:', usuarioId);
+            console.log('Usuarios locales:', usuariosLocales.map(u => ({ id: u.id, nombre: u.nombre })));
+            return { error: 'user_not_found', message: 'Usuario no encontrado' };
         }
 
         const nuevoDiaUso = {
@@ -358,3 +411,13 @@ class VehiculoDatabase {
 
 // Instancia global de la base de datos
 const db = new VehiculoDatabase();
+
+// Función de debug para diagnosticar problemas
+window.debugVehiculos = function() {
+    console.log('=== DEBUG VEHICULOS ===');
+    console.log('Usuario actual:', db.getCurrentUser());
+    console.log('Todos los vehículos:', db.getVehiculos());
+    console.log('Vehículos compartidos:', db.getVehiculosCompartidos());
+    console.log('Todos los días de uso:', db.getDiasUso());
+    console.log('======================');
+};

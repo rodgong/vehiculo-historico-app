@@ -51,10 +51,10 @@ class VehiculoApp {
         
         if (syncBtn) {
             if (status.readOnly) {
-                syncBtn.innerHTML = '🌐 Sincronizar (Solo lectura)';
-                syncBtn.title = 'Datos compartidos disponibles - Solo lectura';
+                syncBtn.innerHTML = '<span class="material-icons">cloud_download</span> Solo lectura';
+                syncBtn.title = 'Haz clic para configurar sincronización completa';
             } else {
-                syncBtn.innerHTML = '🔄 Sincronizar';
+                syncBtn.innerHTML = '<span class="material-icons">sync</span> Sincronizar';
                 syncBtn.title = 'Sincronizar con base de datos compartida';
             }
         }
@@ -68,7 +68,7 @@ class VehiculoApp {
         // Main screen
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
         document.getElementById('syncBtn').addEventListener('click', () => this.handleSync());
-        document.getElementById('exportBtn').addEventListener('click', () => DataSync.downloadUserData());
+
         
         // Detail screen
         document.getElementById('logoutBtnDetail').addEventListener('click', () => this.logout());
@@ -87,11 +87,11 @@ class VehiculoApp {
         document.getElementById('addSharedForm').addEventListener('submit', (e) => this.handleAddSharedVehiculo(e));
         document.getElementById('confirmDateBtn').addEventListener('click', () => this.handleDateSelection());
         
-        // Sync functionality
-        document.getElementById('generateSyncUrlBtn').addEventListener('click', () => this.generateSyncUrl());
-        document.getElementById('importSyncBtn').addEventListener('click', () => this.importFromFile());
-        document.getElementById('importCodeBtn').addEventListener('click', () => showModal('importCodeModal'));
-        document.getElementById('importCodeForm').addEventListener('submit', (e) => this.handleImportCode(e));
+        // GitHub Token Configuration
+        document.getElementById('githubTokenForm').addEventListener('submit', (e) => this.handleGitHubTokenConfig(e));
+        document.getElementById('removeTokenBtn').addEventListener('click', () => this.removeGitHubToken());
+        
+
         
         // Modal overlay
         document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -333,36 +333,42 @@ class VehiculoApp {
         showModal('vehiculoSelectorModal');
     }
 
-    agregarDiaHoy(vehiculoId) {
+    async agregarDiaHoy(vehiculoId) {
         try {
-            const success = db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
-            if (success) {
+            const result = await db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
+            if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
+            } else if (result && result.error) {
+                showToast(result.message, 'warning');
             } else {
                 showToast('Ya existe un registro para hoy', 'warning');
             }
         } catch (error) {
+            console.error('Error al agregar día de uso:', error);
             showToast('Error al agregar día de uso', 'error');
         }
         closeModal();
     }
 
-    agregarDiaFecha(vehiculoId) {
+    async agregarDiaFecha(vehiculoId) {
         if (!this.selectedDate) return;
         
         try {
-            const success = db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
-            if (success) {
+            const result = await db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
+            if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
                 if (this.currentVehiculo && this.currentVehiculo.id === vehiculoId) {
                     this.loadVehiculoDetail();
                 }
+            } else if (result && result.error) {
+                showToast(result.message, 'warning');
             } else {
                 showToast('Ya existe un registro para esta fecha', 'warning');
             }
         } catch (error) {
+            console.error('Error al agregar día de uso:', error);
             showToast('Error al agregar día de uso', 'error');
         }
         closeModal();
@@ -463,8 +469,21 @@ class VehiculoApp {
 
     // GitHub Sync functionality
     async handleSync() {
+        const status = githubDB.getTokenStatus();
+        
+        // Si está en modo solo lectura, mostrar configuración
+        if (status.readOnly) {
+            this.showGitHubTokenConfig();
+            return;
+        }
+        
         try {
-            setButtonLoading('syncBtn', true);
+            // Cambiar texto del botón de sincronización
+            const syncBtn = document.getElementById('syncBtn');
+            const originalHTML = syncBtn.innerHTML;
+            syncBtn.innerHTML = '<span class="material-icons">hourglass_empty</span> Sincronizando...';
+            syncBtn.disabled = true;
+            
             const success = await githubDB.sincronizar();
             
             if (success) {
@@ -486,78 +505,118 @@ class VehiculoApp {
             console.error('Error en sincronización:', error);
             showToast('❌ Error al sincronizar', 'error');
         } finally {
-            setButtonLoading('syncBtn', false);
+            // Restaurar botón de sincronización
+            const syncBtn = document.getElementById('syncBtn');
+            this.updateSyncStatus(); // Esto restaurará el texto correcto del botón
+            syncBtn.disabled = false;
         }
     }
 
-    // Legacy sync functionality
-    generateSyncUrl() {
-        try {
-            DataSync.generateSyncUrl();
-            closeModal();
-            showToast('URL de sincronización generada', 'success');
-        } catch (error) {
-            showToast('Error al generar URL de sincronización', 'error');
+    // GitHub Token Configuration
+    showGitHubTokenConfig() {
+        const status = githubDB.getTokenStatus();
+        
+        // Actualizar estado en el modal
+        const statusText = document.getElementById('tokenStatusText');
+        const removeBtn = document.getElementById('removeTokenBtn');
+        const tokenInput = document.getElementById('githubTokenInput');
+        
+        if (status.hasToken) {
+            statusText.textContent = `Configurado (${status.tokenPreview})`;
+            removeBtn.classList.remove('hidden');
+            tokenInput.placeholder = 'Ingresa un nuevo token para reemplazar el actual';
+        } else {
+            statusText.textContent = 'Solo lectura';
+            removeBtn.classList.add('hidden');
+            tokenInput.placeholder = 'Pega tu Personal Access Token aquí';
         }
+        
+        tokenInput.value = '';
+        showModal('githubTokenModal');
     }
 
-    importFromFile() {
-        // Crear input file temporal
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const success = DataSync.importUserData(e.target.result);
-                    if (success) {
-                        closeModal();
-                        showToast('Datos importados exitosamente', 'success');
-                        // Recargar la aplicación
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
-                    }
-                } catch (error) {
-                    showToast('Error al importar archivo', 'error');
-                }
-            };
-            reader.readAsText(file);
-        };
-        
-        input.click();
-        closeModal();
-    }
-
-    handleImportCode(e) {
+    async handleGitHubTokenConfig(e) {
         e.preventDefault();
         
-        const code = document.getElementById('syncCodeInput').value.trim();
+        const token = document.getElementById('githubTokenInput').value.trim();
         
-        if (!code) {
-            showToast('Ingresa el código de sincronización', 'error');
+        if (!token) {
+            showToast('Ingresa un token válido', 'error');
+            return;
+        }
+        
+        // Validar formato básico del token
+        if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+            showToast('El token no tiene un formato válido', 'error');
             return;
         }
         
         try {
-            const success = DataSync.importFromCode(code);
+            // Cambiar texto del botón en lugar de usar setButtonLoading
+            const submitBtn = document.querySelector('#githubTokenForm button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Configurando...';
+            submitBtn.disabled = true;
+            
+            console.log('🔧 Configurando token GitHub...');
+            
+            // Configurar el token
+            githubDB.setToken(token);
+            console.log('✅ Token configurado en githubDB');
+            
+            // Probar el token haciendo una sincronización
+            console.log('🔄 Probando token con sincronización...');
+            const success = await githubDB.sincronizar();
+            console.log('📊 Resultado sincronización:', success);
+            
             if (success) {
+                showToast('✅ Token configurado correctamente', 'success');
+                this.updateSyncStatus();
                 closeModal();
-                showToast('Datos importados exitosamente', 'success');
-                // Recargar la aplicación
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                
+                // Recargar datos
+                if (this.currentUser) {
+                    this.loadVehiculos();
+                    if (this.currentVehiculo) {
+                        this.loadVehiculoDetail();
+                    }
+                }
+            } else {
+                showToast('⚠️ Token configurado pero sincronización parcial', 'warning');
+                this.updateSyncStatus();
+                closeModal();
             }
+            
         } catch (error) {
-            showToast('Error al importar código', 'error');
+            console.error('Error configurando token:', error);
+            
+            // Remover token inválido
+            githubDB.setToken(null);
+            this.updateSyncStatus();
+            
+            if (error.message.includes('401') || error.message.includes('403')) {
+                showToast('❌ Token inválido o sin permisos', 'error');
+            } else {
+                showToast('❌ Error al configurar token', 'error');
+            }
+        } finally {
+            // Restaurar botón
+            const submitBtn = document.querySelector('#githubTokenForm button[type="submit"]');
+            submitBtn.textContent = 'Configurar';
+            submitBtn.disabled = false;
         }
     }
+
+    removeGitHubToken() {
+        confirmAction('¿Estás seguro de que quieres remover el token de GitHub?', () => {
+            githubDB.setToken(null);
+            this.updateSyncStatus();
+            showToast('Token removido - Modo solo lectura activado', 'info');
+            closeModal();
+        });
+    }
+
+
 }
 
 // Funciones globales para eventos onclick
