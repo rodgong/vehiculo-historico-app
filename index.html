@@ -96,10 +96,7 @@
                         <span class="material-icons">sync</span>
                         Sincronizar
                     </button>
-                    <button id="exportBtn" class="btn-secondary">
-                        <span class="material-icons">download</span>
-                        Exportar
-                    </button>
+
                 </div>
 
                 <div class="action-buttons">
@@ -228,52 +225,7 @@
             </div>
         </div>
 
-        <!-- Sync Modal -->
-        <div id="syncModal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Sincronizar Datos</h2>
-                <p>Transfiere tus datos entre dispositivos:</p>
 
-                <div class="sync-options">
-                    <button id="generateSyncUrlBtn" class="btn-primary" style="width: 100%; margin-bottom: 12px;">
-                        <span class="material-icons">link</span>
-                        Generar URL de Sincronización
-                    </button>
-
-                    <button id="importSyncBtn" class="btn-secondary" style="width: 100%; margin-bottom: 12px;">
-                        <span class="material-icons">file_upload</span>
-                        Importar desde Archivo
-                    </button>
-
-                    <button id="importCodeBtn" class="btn-secondary" style="width: 100%; margin-bottom: 12px;">
-                        <span class="material-icons">qr_code</span>
-                        Importar desde Código
-                    </button>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn-text" onclick="closeModal()">Cerrar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Import Code Modal -->
-        <div id="importCodeModal" class="modal hidden">
-            <div class="modal-content">
-                <h2>Importar desde Código</h2>
-                <p>Pega el código de sincronización:</p>
-                <form id="importCodeForm">
-                    <div class="input-group">
-                        <textarea id="syncCodeInput" placeholder="Pega aquí el código de sincronización..." rows="4"
-                            style="width: 100%; resize: vertical;"></textarea>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
-                        <button type="submit" class="btn-primary">Importar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
     <!-- Toast Messages -->
@@ -281,6 +233,8 @@
 
     <script src="js/security.js"></script>
     <script src="js/database.js"></script>
+    <script src="js/github-database.js"></script>
+    <script src="js/database-adapter.js"></script>
     <script src="js/components.js"></script>
     <script src="js/debug.js"></script>
     <script src="js/sync.js"></script>

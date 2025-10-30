@@ -7,9 +7,57 @@ class VehiculoApp {
         this.init();
     }
 
-    init() {
+    async init() {
+        // Inicializar GitHub Database
+        await this.initializeGitHubDatabase();
+        
         this.setupEventListeners();
         this.checkAuthState();
+    }
+
+    async initializeGitHubDatabase() {
+        try {
+            // Inicializar GitHub Database en modo solo lectura
+            await githubDB.init();
+            console.log('✅ GitHub Database inicializada');
+            
+            // Mostrar estado de sincronización
+            this.updateSyncStatus();
+            
+            // Sincronizar automáticamente al iniciar
+            setTimeout(() => {
+                this.autoSync();
+            }, 2000);
+            
+        } catch (error) {
+            console.error('❌ Error inicializando GitHub Database:', error);
+            showToast('Modo offline - datos solo locales', 'warning');
+        }
+    }
+
+    async autoSync() {
+        try {
+            console.log('🔄 Sincronización automática...');
+            await githubDB.sincronizar();
+            this.updateSyncStatus();
+        } catch (error) {
+            console.log('⚠️ Sincronización automática fallida:', error);
+        }
+    }
+
+    updateSyncStatus() {
+        const status = githubDB.getStatus();
+        const syncBtn = document.getElementById('syncBtn');
+        
+        if (syncBtn) {
+            if (status.readOnly) {
+                syncBtn.innerHTML = '🌐 Sincronizar (Solo lectura)';
+                syncBtn.title = 'Datos compartidos disponibles - Solo lectura';
+            } else {
+                syncBtn.innerHTML = '🔄 Sincronizar';
+                syncBtn.title = 'Sincronizar con base de datos compartida';
+            }
+        }
     }
 
     setupEventListeners() {
@@ -19,8 +67,8 @@ class VehiculoApp {
         
         // Main screen
         document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
-        document.getElementById('syncBtn').addEventListener('click', () => showModal('syncModal'));
-        document.getElementById('exportBtn').addEventListener('click', () => DataSync.downloadUserData());
+        document.getElementById('syncBtn').addEventListener('click', () => this.handleSync());
+
         
         // Detail screen
         document.getElementById('logoutBtnDetail').addEventListener('click', () => this.logout());
@@ -39,11 +87,7 @@ class VehiculoApp {
         document.getElementById('addSharedForm').addEventListener('submit', (e) => this.handleAddSharedVehiculo(e));
         document.getElementById('confirmDateBtn').addEventListener('click', () => this.handleDateSelection());
         
-        // Sync functionality
-        document.getElementById('generateSyncUrlBtn').addEventListener('click', () => this.generateSyncUrl());
-        document.getElementById('importSyncBtn').addEventListener('click', () => this.importFromFile());
-        document.getElementById('importCodeBtn').addEventListener('click', () => showModal('importCodeModal'));
-        document.getElementById('importCodeForm').addEventListener('submit', (e) => this.handleImportCode(e));
+
         
         // Modal overlay
         document.getElementById('modalOverlay').addEventListener('click', (e) => {
@@ -413,74 +457,36 @@ class VehiculoApp {
         }
     }
 
-    // Sync functionality
-    generateSyncUrl() {
+    // GitHub Sync functionality
+    async handleSync() {
         try {
-            DataSync.generateSyncUrl();
-            closeModal();
-            showToast('URL de sincronización generada', 'success');
-        } catch (error) {
-            showToast('Error al generar URL de sincronización', 'error');
-        }
-    }
-
-    importFromFile() {
-        // Crear input file temporal
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            setButtonLoading('syncBtn', true);
+            const success = await githubDB.sincronizar();
             
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const success = DataSync.importUserData(e.target.result);
-                    if (success) {
-                        closeModal();
-                        showToast('Datos importados exitosamente', 'success');
-                        // Recargar la aplicación
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+            if (success) {
+                showToast('✅ Sincronización completada', 'success');
+                // Recargar datos si estamos en pantalla principal
+                if (this.currentUser) {
+                    this.loadVehiculos();
+                    if (this.currentVehiculo) {
+                        this.loadVehiculoDetail();
                     }
-                } catch (error) {
-                    showToast('Error al importar archivo', 'error');
                 }
-            };
-            reader.readAsText(file);
-        };
-        
-        input.click();
-        closeModal();
+            } else {
+                showToast('⚠️ Sincronización parcial (solo local)', 'warning');
+            }
+            
+            this.updateSyncStatus();
+            
+        } catch (error) {
+            console.error('Error en sincronización:', error);
+            showToast('❌ Error al sincronizar', 'error');
+        } finally {
+            setButtonLoading('syncBtn', false);
+        }
     }
 
-    handleImportCode(e) {
-        e.preventDefault();
-        
-        const code = document.getElementById('syncCodeInput').value.trim();
-        
-        if (!code) {
-            showToast('Ingresa el código de sincronización', 'error');
-            return;
-        }
-        
-        try {
-            const success = DataSync.importFromCode(code);
-            if (success) {
-                closeModal();
-                showToast('Datos importados exitosamente', 'success');
-                // Recargar la aplicación
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }
-        } catch (error) {
-            showToast('Error al importar código', 'error');
-        }
-    }
+
 }
 
 // Funciones globales para eventos onclick

@@ -1,6 +1,7 @@
-// Database management using localStorage
+// Database management using GitHub as shared backend
 class VehiculoDatabase {
     constructor() {
+        this.githubDB = window.githubDB;
         this.initializeDatabase();
     }
 
@@ -32,6 +33,13 @@ class VehiculoDatabase {
     }
 
     async registrarUsuario(nombre, email, password) {
+        // Usar GitHub Database para registro
+        if (this.githubDB && this.githubDB.initialized) {
+            const { hash, salt } = await SecurityUtils.hashPasswordWithSalt(password);
+            return await this.githubDB.registrarUsuario(nombre, email, hash, salt);
+        }
+        
+        // Fallback a localStorage
         const usuarios = this.getUsuarios();
         
         // Verificar si el email ya existe
@@ -61,18 +69,30 @@ class VehiculoDatabase {
 
     async login(email, password) {
         try {
+            // Usar GitHub Database para login si está disponible
+            if (this.githubDB && this.githubDB.initialized) {
+                console.log('🌐 Intentando login con GitHub Database...');
+                const result = await this.githubDB.login(email, password);
+                if (result) {
+                    console.log('🎉 Login exitoso con GitHub Database');
+                    return result;
+                }
+                console.log('⚠️ Login fallido en GitHub, intentando local...');
+            }
+
+            // Fallback a localStorage
             const usuarios = this.getUsuarios();
-            console.log('🔍 Intento de login para:', email);
-            console.log('📊 Total usuarios registrados:', usuarios.length);
+            console.log('🔍 Intento de login local para:', email);
+            console.log('📊 Total usuarios locales:', usuarios.length);
             
             const usuario = usuarios.find(u => u.email === email);
             
             if (!usuario) {
-                console.log('❌ Usuario no encontrado');
+                console.log('❌ Usuario no encontrado localmente');
                 return null;
             }
 
-            console.log('✅ Usuario encontrado:', {
+            console.log('✅ Usuario encontrado localmente:', {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 email: usuario.email,
@@ -131,7 +151,7 @@ class VehiculoDatabase {
                 };
                 
                 localStorage.setItem('vehiculo_current_user', JSON.stringify(userSafe));
-                console.log('🎉 Login exitoso para:', userSafe.nombre);
+                console.log('🎉 Login exitoso local para:', userSafe.nombre);
                 return userSafe;
             }
             
