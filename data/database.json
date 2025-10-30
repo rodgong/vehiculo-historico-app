@@ -170,6 +170,16 @@
       "compartido": false,
       "codigoCompartido": null,
       "fechaCreacion": "2025-10-30T11:27:36.868Z"
+    },
+    {
+      "id": 1761823895356,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761823885092,
+      "compartido": false,
+      "codigoCompartido": null,
+      "fechaCreacion": "2025-10-30T11:31:35.356Z"
     }
   ],
   "diasUso": [
@@ -415,6 +425,6 @@
     }
   ],
   "compartidos": [],
-  "lastSync": "2025-10-30T11:31:28.525Z",
+  "lastSync": "2025-10-30T11:37:42.324Z",
   "version": "1.0"
 }
