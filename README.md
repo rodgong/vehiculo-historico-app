@@ -1,130 +1,127 @@
-<<<<<<< HEAD
-# 🚗 Control de Días Vehículo Histórico
+# Control de Días Vehículo Histórico
 
-Una aplicación web progresiva (PWA) para controlar los días de uso de vehículos históricos con sistema de alertas y compartir entre usuarios.
+Una aplicación Android para controlar los días de uso de vehículos históricos, con funcionalidad de compartir entre usuarios.
 
-## 🌟 Características
-
-- ✅ **Sistema de usuarios** con login seguro
-- ✅ **Gestión de vehículos** históricos
-- ✅ **Control de días de uso** con contador automático
-- ✅ **Sistema de alertas** (90 y 96 días)
-- ✅ **Compartir vehículos** por WhatsApp y Email
-- ✅ **Funciona offline** (PWA)
-- ✅ **Optimizada para móviles** Android e iOS
-- ✅ **Instalable** como app nativa
-
-## 📱 Uso en Móvil
-
-### Instalar como PWA:
-1. Abre la aplicación en Chrome móvil
-2. Toca el menú ⋮ → "Agregar a pantalla de inicio"
-3. ¡Úsala como una app nativa!
-
-### Funcionalidades móviles:
-- Interfaz táctil optimizada
-- Botones grandes para fácil uso
-- Compartir directo a WhatsApp
-- Funciona sin conexión a internet
-
-## 🚀 Acceso Directo
-
-**[🔗 Abrir Aplicación](https://TU-USUARIO.github.io/vehiculo-historico-app/)**
-
-## 🛠️ Tecnologías
-
-- **HTML5** + **CSS3** + **JavaScript ES6+**
-- **PWA** (Progressive Web App)
-- **Service Worker** para funcionamiento offline
-- **localStorage** para almacenamiento local
-- **Material Design** para la interfaz
-- **Responsive Design** para todos los dispositivos
-
-## 📋 Funcionalidades Principales
+## Características
 
 ### 🔐 Sistema de Usuarios
-- Registro e inicio de sesión seguro
-- Contraseñas hasheadas con salt
-- Sesión persistente
+- Login y registro de usuarios
+- Cada usuario tiene sus propios vehículos
+- Datos seguros almacenados localmente
 
 ### 🚗 Gestión de Vehículos
-- Agregar vehículos (nombre, marca, modelo)
-- Eliminar vehículos
-- Compartir vehículos entre usuarios
+- Agregar vehículos con nombre, marca y modelo
+- Lista de todos los vehículos del usuario
+- Eliminar vehículos con confirmación
 
-### 📅 Control de Días
-- Marcar uso del día actual
+### 📅 Control de Días de Uso
+- Marcar uso para el día actual con un botón
 - Agregar días de uso para fechas pasadas
-- Historial completo con fechas y usuarios
-- Contador automático de días acumulados
-
-### ⚠️ Sistema de Alertas
-- **90 días**: Alerta naranja "Se acerca al límite"
-- **96 días**: Alerta roja "Límite alcanzado"
-- Colores visuales en la interfaz
+- Contador visual de días acumulados
+- Historial completo de días utilizados
 
 ### 🤝 Compartir Vehículos
-- Generar códigos únicos para compartir
-- Envío por WhatsApp o Email
-- Múltiples usuarios pueden usar el mismo vehículo
-- Registro de qué usuario agregó cada día
+- Compartir vehículos por WhatsApp o Email
+- Código único para cada vehículo compartido
+- Múltiples usuarios pueden agregar días al mismo vehículo
+- Visualización de qué usuario agregó cada día
 
-## 🔧 Instalación Local
+### ⚠️ Sistema de Alertas
+- **Alerta naranja** a los 90 días: "Se acerca al límite de uso"
+- **Alerta roja** a los 96 días: "Límite de uso alcanzado"
+- Colores visuales en las tarjetas de vehículos
 
-```bash
-# Clonar repositorio
-git clone https://github.com/TU-USUARIO/vehiculo-historico-app.git
+### 📱 Interfaz Intuitiva
+- Diseño moderno con Material Design 3
+- Navegación simple y clara
+- Botones de acción rápida en la pantalla principal
 
-# Entrar al directorio
-cd vehiculo-historico-app
+## Funcionalidades Principales
 
-# Servir localmente
-python -m http.server 8000
-# O con Node.js
-npx serve . -p 8000
+### Pantalla Principal
+- **Botón "+"**: Agregar nuevo vehículo propio
+- **Botón "Código"**: Agregar vehículo compartido por código
+- **Botón "Hoy"**: Marcar uso del día actual
+- **Botón "Fecha"**: Agregar uso para fecha específica
 
-# Abrir en navegador
-# http://localhost:8000
+### Detalle de Vehículo
+- Ver historial completo de días de uso
+- Identificar qué usuario agregó cada día
+- Eliminar días de uso específicos
+- Compartir vehículo por WhatsApp o Email
+
+### Compartir Vehículos
+1. El propietario comparte el vehículo
+2. Se genera un código único
+3. El mensaje se envía por WhatsApp o Email
+4. El receptor usa el código para agregar el vehículo
+5. Ambos usuarios pueden agregar días de uso
+
+## Tecnologías Utilizadas
+
+- **Kotlin** - Lenguaje de programación
+- **Jetpack Compose** - UI moderna y declarativa
+- **Room Database** - Base de datos local
+- **Hilt** - Inyección de dependencias
+- **Navigation Compose** - Navegación entre pantallas
+- **Material Design 3** - Diseño y componentes
+
+## Estructura del Proyecto
+
+```
+app/src/main/java/com/vehiculohistorico/control/
+├── data/
+│   ├── entities/          # Entidades de base de datos
+│   ├── dao/              # Data Access Objects
+│   ├── database/         # Configuración de Room
+│   └── repository/       # Repositorios de datos
+├── di/                   # Módulos de Hilt
+├── ui/
+│   ├── screens/          # Pantallas de la aplicación
+│   ├── components/       # Componentes reutilizables
+│   ├── viewmodel/        # ViewModels
+│   └── theme/           # Tema y estilos
+└── utils/               # Utilidades (compartir, etc.)
 ```
 
-## 📱 Compatibilidad
+## Instalación y Uso
 
-- ✅ **Chrome** (recomendado)
-- ✅ **Firefox**
-- ✅ **Safari**
-- ✅ **Edge**
-- ✅ **Chrome Mobile** (Android)
-- ✅ **Safari Mobile** (iOS)
+1. **Clonar el repositorio**
+2. **Abrir en Android Studio**
+3. **Sincronizar Gradle**
+4. **Ejecutar en dispositivo o emulador**
 
-## 🔒 Seguridad
+### Primer Uso
+1. Crear cuenta o iniciar sesión
+2. Agregar tu primer vehículo histórico
+3. Comenzar a registrar días de uso
+4. Compartir con otros usuarios si es necesario
 
-- Contraseñas hasheadas con SHA-256 + salt único
-- Datos almacenados localmente (no en servidor)
-- Validación de entrada robusta
-- Limpieza automática de datos sensibles
+## Límites de Uso
 
-## 📄 Licencia
+La aplicación está diseñada para vehículos históricos que tienen restricciones legales:
+- **90 días**: Advertencia de proximidad al límite
+- **96 días**: Límite máximo alcanzado
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+## Compartir entre Usuarios
 
-## 🤝 Contribuir
+### Para Compartir:
+1. Ir al detalle del vehículo
+2. Presionar "WhatsApp" o "Email"
+3. Enviar el mensaje con el código
 
-Las contribuciones son bienvenidas. Por favor:
+### Para Recibir:
+1. Usar el botón "Código" en la pantalla principal
+2. Ingresar el código recibido
+3. El vehículo aparecerá en tu lista
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+## Características de Seguridad
 
-## 📞 Soporte
-
-Si tienes problemas o sugerencias, por favor abre un [issue](https://github.com/TU-USUARIO/vehiculo-historico-app/issues).
+- Datos almacenados localmente en el dispositivo
+- No se requiere conexión a internet para uso básico
+- Códigos únicos para cada vehículo compartido
+- Validación de usuarios y permisos
 
 ---
 
 **Desarrollado para el control eficiente de vehículos históricos** 🚗📱
-=======
-# vehiculo-historico-app
-Aplicación web para control de días de vehículos históricos
->>>>>>> e0689ccd31863bae19cb7e8908ce4c32fb8f6b25

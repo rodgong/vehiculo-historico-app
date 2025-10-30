@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Control de Días Vehículo Histórico</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1976d2">
+
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Vehículo Histórico">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Favicon y iconos -->
+    <link rel="apple-touch-icon" sizes="192x192"
+        href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjMTk3NmQyIi8+CjxwYXRoIGQ9Ik00OCA5NmMwLTI2LjUxIDIxLjQ5LTQ4IDQ4LTQ4czQ4IDIxLjQ5IDQ4IDQ4LTIxLjQ5IDQ4LTQ4IDQ4LTQ4LTIxLjQ5LTQ4LTQ4eiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNzIgODRoNDh2MjRINzJ6IiBmaWxsPSIjMTk3NmQyIi8+Cjx0ZXh0IHg9Ijk2IiB5PSIxNTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VkE8L3RleHQ+Cjwvc3ZnPg==">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjMTk3NmQyIi8+CjxwYXRoIGQ9Ik00OCA5NmMwLTI2LjUxIDIxLjQ5LTQ4IDQ4LTQ4czQ4IDIxLjQ5IDQ4IDQ4LTIxLjQ5IDQ4LTQ4IDQ4LTQ4LTIxLjQ5LTQ4LTQ4eiIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNNzIgODRoNDh2MjRINzJ6IiBmaWxsPSIjMTk3NmQyIi8+Cjx0ZXh0IHg9Ijk2IiB5PSIxNTYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VkE8L3RleHQ+Cjwvc3ZnPg==">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen active">
+            <div class="container">
+                <div class="login-card">
+                    <h1>Control de Días Vehículo Histórico</h1>
+
+                    <form id="loginForm">
+                        <div id="registerFields" class="hidden">
+                            <div class="input-group">
+                                <input type="text" id="nombre" placeholder="Nombre completo">
+                                <span class="material-icons">person</span>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" id="email" placeholder="Email" required>
+                            <span class="material-icons">email</span>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" id="password" placeholder="Contraseña" required>
+                            <span class="material-icons">lock</span>
+                        </div>
+
+                        <button type="submit" id="loginBtn" class="btn-primary">
+                            <span class="btn-text">Iniciar Sesión</span>
+                            <div class="loading hidden">
+                                <div class="spinner"></div>
+                            </div>
+                        </button>
+
+                        <button type="button" id="toggleMode" class="btn-text">
+                            ¿No tienes cuenta? Regístrate
+                        </button>
+                    </form>
+
+                    <div id="errorMessage" class="error-message hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Screen -->
+        <div id="mainScreen" class="screen">
+            <header class="app-header">
+                <h1>Mis Vehículos Históricos</h1>
+                <div class="user-info">
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutBtn" class="btn-icon">
+                        <span class="material-icons">logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="container">
+                <div class="action-buttons">
+                    <button id="addVehiculoBtn" class="btn-primary">
+                        <span class="material-icons">add</span>
+                        Nuevo
+                    </button>
+                    <button id="addSharedBtn" class="btn-secondary">
+                        <span class="material-icons">share</span>
+                        Código
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="syncBtn" class="btn-accent">
+                        <span class="material-icons">sync</span>
+                        Sincronizar
+                    </button>
+                    <button id="exportBtn" class="btn-secondary">
+                        <span class="material-icons">download</span>
+                        Exportar
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="todayBtn" class="btn-accent">
+                        <span class="material-icons">today</span>
+                        Hoy
+                    </button>
+                    <button id="dateBtn" class="btn-accent">
+                        <span class="material-icons">date_range</span>
+                        Fecha
+                    </button>
+                </div>
+
+                <div id="vehiculosList" class="vehiculos-list">
+                    <!-- Vehículos se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Detail Screen -->
+        <div id="detailScreen" class="screen">
+            <header class="app-header">
+                <button id="backBtn" class="btn-icon">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div class="header-info">
+                    <h1 id="vehiculoNombre"></h1>
+                    <p id="vehiculoInfo"></p>
+                </div>
+                <div class="user-info">
+                    <span id="userNameDetail" class="user-name"></span>
+                    <button id="logoutBtnDetail" class="btn-icon">
+                        <span class="material-icons">logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="container">
+                <div id="contadorCard" class="contador-card">
+                    <h2 id="contadorDias">0 días</h2>
+                    <p id="alertaTexto"></p>
+                </div>
+
+                <div class="share-buttons">
+                    <button id="shareWhatsAppBtn" class="btn-whatsapp">
+                        WhatsApp
+                    </button>
+                    <button id="shareEmailBtn" class="btn-email">
+                        Email
+                    </button>
+                </div>
+
+                <h3>Historial de uso</h3>
+                <div id="historialList" class="historial-list">
+                    <!-- Historial se cargará aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <!-- Add Vehicle Modal -->
+        <div id="addVehiculoModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Agregar Vehículo</h2>
+                <form id="addVehiculoForm">
+                    <div class="input-group">
+                        <input type="text" id="vehiculoNombreInput" placeholder="Nombre del vehículo" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="vehiculoMarcaInput" placeholder="Marca" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="vehiculoModeloInput" placeholder="Modelo" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Shared Vehicle Modal -->
+        <div id="addSharedModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Agregar Vehículo Compartido</h2>
+                <p>Ingresa el código del vehículo que te han compartido:</p>
+                <form id="addSharedForm">
+                    <div class="input-group">
+                        <input type="text" id="codigoInput" placeholder="Código del vehículo" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vehicle Selector Modal -->
+        <div id="vehiculoSelectorModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Seleccionar Vehículo</h2>
+                <div id="vehiculoSelectorList" class="vehiculo-selector-list">
+                    <!-- Lista de vehículos se cargará aquí -->
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Picker Modal -->
+        <div id="datePickerModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Seleccionar Fecha</h2>
+                <div class="input-group">
+                    <input type="date" id="fechaInput" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                    <button type="button" id="confirmDateBtn" class="btn-primary">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Modal -->
+        <div id="syncModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Sincronizar Datos</h2>
+                <p>Transfiere tus datos entre dispositivos:</p>
+
+                <div class="sync-options">
+                    <button id="generateSyncUrlBtn" class="btn-primary" style="width: 100%; margin-bottom: 12px;">
+                        <span class="material-icons">link</span>
+                        Generar URL de Sincronización
+                    </button>
+
+                    <button id="importSyncBtn" class="btn-secondary" style="width: 100%; margin-bottom: 12px;">
+                        <span class="material-icons">file_upload</span>
+                        Importar desde Archivo
+                    </button>
+
+                    <button id="importCodeBtn" class="btn-secondary" style="width: 100%; margin-bottom: 12px;">
+                        <span class="material-icons">qr_code</span>
+                        Importar desde Código
+                    </button>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Code Modal -->
+        <div id="importCodeModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Importar desde Código</h2>
+                <p>Pega el código de sincronización:</p>
+                <form id="importCodeForm">
+                    <div class="input-group">
+                        <textarea id="syncCodeInput" placeholder="Pega aquí el código de sincronización..." rows="4"
+                            style="width: 100%; resize: vertical;"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Importar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Messages -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/security.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/github-database.js"></script>
+    <script src="js/database-adapter.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/sync.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

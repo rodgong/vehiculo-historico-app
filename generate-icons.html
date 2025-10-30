@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de Iconos</title>
+</head>
+<body>
+    <h1>Generador de Iconos para Cordova</h1>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <br><br>
+    <button onclick="generateIcon(36, 'ldpi')">LDPI (36x36)</button>
+    <button onclick="generateIcon(48, 'mdpi')">MDPI (48x48)</button>
+    <button onclick="generateIcon(72, 'hdpi')">HDPI (72x72)</button>
+    <button onclick="generateIcon(96, 'xhdpi')">XHDPI (96x96)</button>
+    <button onclick="generateIcon(144, 'xxhdpi')">XXHDPI (144x144)</button>
+    <button onclick="generateIcon(192, 'xxxhdpi')">XXXHDPI (192x192)</button>
+
+    <script>
+        function generateIcon(size, density) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Fondo azul
+            ctx.fillStyle = '#1976d2';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Círculo blanco
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/3, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Texto "VH"
+            ctx.fillStyle = '#1976d2';
+            ctx.font = `bold ${size/4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('VH', size/2, size/2);
+            
+            // Descargar
+            const link = document.createElement('a');
+            link.download = `drawable-${density}-icon.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
