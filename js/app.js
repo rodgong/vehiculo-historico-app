@@ -51,10 +51,10 @@ class VehiculoApp {
         
         if (syncBtn) {
             if (status.readOnly) {
-                syncBtn.innerHTML = '🌐 Sincronizar (Solo lectura)';
-                syncBtn.title = 'Datos compartidos disponibles - Solo lectura';
+                syncBtn.innerHTML = '<span class="material-icons">cloud_download</span> Solo lectura';
+                syncBtn.title = 'Haz clic para configurar sincronización completa';
             } else {
-                syncBtn.innerHTML = '🔄 Sincronizar';
+                syncBtn.innerHTML = '<span class="material-icons">sync</span> Sincronizar';
                 syncBtn.title = 'Sincronizar con base de datos compartida';
             }
         }
@@ -86,6 +86,10 @@ class VehiculoApp {
         document.getElementById('addVehiculoForm').addEventListener('submit', (e) => this.handleAddVehiculo(e));
         document.getElementById('addSharedForm').addEventListener('submit', (e) => this.handleAddSharedVehiculo(e));
         document.getElementById('confirmDateBtn').addEventListener('click', () => this.handleDateSelection());
+        
+        // GitHub Token Configuration
+        document.getElementById('githubTokenForm').addEventListener('submit', (e) => this.handleGitHubTokenConfig(e));
+        document.getElementById('removeTokenBtn').addEventListener('click', () => this.removeGitHubToken());
         
 
         
@@ -465,6 +469,14 @@ class VehiculoApp {
 
     // GitHub Sync functionality
     async handleSync() {
+        const status = githubDB.getTokenStatus();
+        
+        // Si está en modo solo lectura, mostrar configuración
+        if (status.readOnly) {
+            this.showGitHubTokenConfig();
+            return;
+        }
+        
         try {
             setButtonLoading('syncBtn', true);
             const success = await githubDB.sincronizar();
@@ -490,6 +502,98 @@ class VehiculoApp {
         } finally {
             setButtonLoading('syncBtn', false);
         }
+    }
+
+    // GitHub Token Configuration
+    showGitHubTokenConfig() {
+        const status = githubDB.getTokenStatus();
+        
+        // Actualizar estado en el modal
+        const statusText = document.getElementById('tokenStatusText');
+        const removeBtn = document.getElementById('removeTokenBtn');
+        const tokenInput = document.getElementById('githubTokenInput');
+        
+        if (status.hasToken) {
+            statusText.textContent = `Configurado (${status.tokenPreview})`;
+            removeBtn.classList.remove('hidden');
+            tokenInput.placeholder = 'Ingresa un nuevo token para reemplazar el actual';
+        } else {
+            statusText.textContent = 'Solo lectura';
+            removeBtn.classList.add('hidden');
+            tokenInput.placeholder = 'Pega tu Personal Access Token aquí';
+        }
+        
+        tokenInput.value = '';
+        showModal('githubTokenModal');
+    }
+
+    async handleGitHubTokenConfig(e) {
+        e.preventDefault();
+        
+        const token = document.getElementById('githubTokenInput').value.trim();
+        
+        if (!token) {
+            showToast('Ingresa un token válido', 'error');
+            return;
+        }
+        
+        // Validar formato básico del token
+        if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+            showToast('El token no tiene un formato válido', 'error');
+            return;
+        }
+        
+        try {
+            setButtonLoading('githubTokenForm', true);
+            
+            // Configurar el token
+            githubDB.setToken(token);
+            
+            // Probar el token haciendo una sincronización
+            const success = await githubDB.sincronizar();
+            
+            if (success) {
+                showToast('✅ Token configurado correctamente', 'success');
+                this.updateSyncStatus();
+                closeModal();
+                
+                // Recargar datos
+                if (this.currentUser) {
+                    this.loadVehiculos();
+                    if (this.currentVehiculo) {
+                        this.loadVehiculoDetail();
+                    }
+                }
+            } else {
+                showToast('⚠️ Token configurado pero sincronización parcial', 'warning');
+                this.updateSyncStatus();
+                closeModal();
+            }
+            
+        } catch (error) {
+            console.error('Error configurando token:', error);
+            
+            // Remover token inválido
+            githubDB.setToken(null);
+            this.updateSyncStatus();
+            
+            if (error.message.includes('401') || error.message.includes('403')) {
+                showToast('❌ Token inválido o sin permisos', 'error');
+            } else {
+                showToast('❌ Error al configurar token', 'error');
+            }
+        } finally {
+            setButtonLoading('githubTokenForm', false);
+        }
+    }
+
+    removeGitHubToken() {
+        confirmAction('¿Estás seguro de que quieres remover el token de GitHub?', () => {
+            githubDB.setToken(null);
+            this.updateSyncStatus();
+            showToast('Token removido - Modo solo lectura activado', 'info');
+            closeModal();
+        });
     }
 
 

@@ -228,6 +228,45 @@
 
     </div>
 
+    <!-- GitHub Token Configuration Modal -->
+    <div id="githubTokenModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Configurar GitHub Database</h2>
+            <p>Para habilitar la sincronización completa entre dispositivos, configura tu Personal Access Token de
+                GitHub:</p>
+
+            <div class="token-status" id="tokenStatus">
+                <div class="status-item">
+                    <span class="material-icons">info</span>
+                    <span>Estado: <span id="tokenStatusText">Solo lectura</span></span>
+                </div>
+            </div>
+
+            <form id="githubTokenForm">
+                <div class="input-group">
+                    <input type="password" id="githubTokenInput" placeholder="Pega tu Personal Access Token aquí">
+                    <span class="material-icons">vpn_key</span>
+                </div>
+
+                <div class="help-text">
+                    <p><strong>¿Cómo obtener un token?</strong></p>
+                    <ol>
+                        <li>Ve a GitHub.com → Settings → Developer settings</li>
+                        <li>Personal access tokens → Tokens (classic)</li>
+                        <li>Generate new token → Marca "repo" scope</li>
+                        <li>Copia el token y pégalo aquí</li>
+                    </ol>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cancelar</button>
+                    <button type="button" id="removeTokenBtn" class="btn-secondary hidden">Remover Token</button>
+                    <button type="submit" class="btn-primary">Configurar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Messages -->
     <div id="toast" class="toast hidden"></div>
 
