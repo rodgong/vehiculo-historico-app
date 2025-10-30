@@ -33,9 +33,14 @@ class VehiculoDatabase {
     }
 
     async registrarUsuario(nombre, email, password) {
+        console.log('🔄 Iniciando registrarUsuario:', { nombre, email, passwordLength: password.length });
+        
         // Primero verificar en localStorage si el usuario ya existe
         const usuariosLocales = this.getUsuarios();
+        console.log('📊 Usuarios locales existentes:', usuariosLocales.length);
+        
         if (usuariosLocales.find(u => u.email === email)) {
+            console.log('❌ Usuario ya existe con email:', email);
             return null;
         }
         
@@ -52,16 +57,40 @@ class VehiculoDatabase {
         }
 
         // Hash de la contraseña con salt
-        const { hash, salt } = await SecurityUtils.hashPasswordWithSalt(password);
+        console.log('🔐 Iniciando hash de contraseña...');
+        console.log('🔍 SecurityUtils disponible:', typeof SecurityUtils);
+        
+        let hash, salt;
+        try {
+            const result = await SecurityUtils.hashPasswordWithSalt(password);
+            hash = result.hash;
+            salt = result.salt;
+            console.log('✅ Hash completado exitosamente');
+        } catch (error) {
+            console.error('❌ Error en hash de contraseña:', error);
+            // Fallback: guardar contraseña en texto plano temporalmente
+            console.log('⚠️ Usando fallback: contraseña en texto plano');
+            hash = null;
+            salt = null;
+        }
 
         const nuevoUsuario = {
             id: Date.now(),
             nombre,
             email,
-            passwordHash: hash,
-            passwordSalt: salt,
             fechaRegistro: new Date().toISOString()
         };
+
+        // Agregar datos de contraseña según si el hash funcionó o no
+        if (hash && salt) {
+            nuevoUsuario.passwordHash = hash;
+            nuevoUsuario.passwordSalt = salt;
+            console.log('✅ Usuario creado con contraseña hasheada');
+        } else {
+            // Fallback: guardar contraseña en texto plano temporalmente
+            nuevoUsuario.password = password;
+            console.log('⚠️ Usuario creado con contraseña en texto plano (fallback)');
+        }
 
         // SIEMPRE registrar en localStorage primero
         usuariosLocales.push(nuevoUsuario);

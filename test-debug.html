@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Test de Registro</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Debug - Test de Registro de Usuarios</h1>
+    
+    <div class="debug-section">
+        <h3>Test de Registro</h3>
+        <button onclick="testRegistro()">Probar Registro</button>
+        <button onclick="testLogin()">Probar Login</button>
+        <button onclick="limpiarDatos()">Limpiar Datos</button>
+        <button onclick="mostrarDatos()">Mostrar Datos</button>
+    </div>
+    
+    <div class="debug-section">
+        <h3>Logs</h3>
+        <div id="logs" class="log"></div>
+    </div>
+
+    <!-- Cargar scripts en el mismo orden que la app principal -->
+    <script src="js/security.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/github-database.js"></script>
+    <script src="js/database-adapter.js"></script>
+    <script src="js/components.js"></script>
+
+    <script>
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            logsDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        async function testRegistro() {
+            log('=== INICIANDO TEST DE REGISTRO ===');
+            
+            const testUser = {
+                nombre: 'Usuario Test',
+                email: 'test@example.com',
+                password: 'TestPassword123'
+            };
+            
+            log(`Intentando registrar: ${testUser.nombre} (${testUser.email})`);
+            
+            try {
+                const result = await db.registrarUsuario(testUser.nombre, testUser.email, testUser.password);
+                
+                if (result) {
+                    log('✅ REGISTRO EXITOSO');
+                    log(`Usuario creado: ${JSON.stringify(result, null, 2)}`);
+                    
+                    // Verificar que se guardó en localStorage
+                    const usuarios = db.getUsuarios();
+                    log(`Total usuarios en localStorage: ${usuarios.length}`);
+                    
+                } else {
+                    log('❌ REGISTRO FALLÓ - Usuario ya existe o error');
+                }
+                
+            } catch (error) {
+                log('💥 ERROR EN REGISTRO: ' + error.message);
+                console.error(error);
+            }
+            
+            log('=== FIN TEST DE REGISTRO ===\n');
+        }
+
+        async function testLogin() {
+            log('=== INICIANDO TEST DE LOGIN ===');
+            
+            const testCredentials = {
+                email: 'test@example.com',
+                password: 'TestPassword123'
+            };
+            
+            log(`Intentando login: ${testCredentials.email}`);
+            
+            try {
+                const result = await db.login(testCredentials.email, testCredentials.password);
+                
+                if (result) {
+                    log('✅ LOGIN EXITOSO');
+                    log(`Usuario logueado: ${JSON.stringify(result, null, 2)}`);
+                    
+                    // Verificar usuario actual
+                    const currentUser = db.getCurrentUser();
+                    log(`Usuario actual: ${JSON.stringify(currentUser, null, 2)}`);
+                    
+                } else {
+                    log('❌ LOGIN FALLÓ - Credenciales incorrectas');
+                }
+                
+            } catch (error) {
+                log('💥 ERROR EN LOGIN: ' + error.message);
+                console.error(error);
+            }
+            
+            log('=== FIN TEST DE LOGIN ===\n');
+        }
+
+        function limpiarDatos() {
+            log('🧹 Limpiando todos los datos...');
+            localStorage.removeItem('vehiculo_usuarios');
+            localStorage.removeItem('vehiculo_current_user');
+            localStorage.removeItem('vehiculo_vehiculos');
+            localStorage.removeItem('vehiculo_dias_uso');
+            localStorage.removeItem('vehiculo_compartidos');
+            
+            // Reinicializar
+            db.initializeDatabase();
+            log('✅ Datos limpiados y reinicializados');
+        }
+
+        function mostrarDatos() {
+            log('=== ESTADO ACTUAL DE DATOS ===');
+            
+            const usuarios = db.getUsuarios();
+            const currentUser = db.getCurrentUser();
+            
+            log(`Total usuarios: ${usuarios.length}`);
+            log(`Usuario actual: ${currentUser ? currentUser.nombre : 'Ninguno'}`);
+            
+            if (usuarios.length > 0) {
+                log('Usuarios registrados:');
+                usuarios.forEach((user, index) => {
+                    log(`  ${index + 1}. ${user.nombre} (${user.email}) - ID: ${user.id}`);
+                    log(`     Tiene password: ${!!user.password}`);
+                    log(`     Tiene passwordHash: ${!!user.passwordHash}`);
+                    log(`     Tiene passwordSalt: ${!!user.passwordSalt}`);
+                });
+            }
+            
+            log('=== FIN ESTADO DATOS ===\n');
+        }
+
+        // Verificar que SecurityUtils esté disponible
+        log(`SecurityUtils disponible: ${typeof SecurityUtils}`);
+        log(`Database inicializada: ${typeof db}`);
+        
+        // Mostrar datos iniciales
+        mostrarDatos();
+    </script>
+</body>
+</html>
