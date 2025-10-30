@@ -478,7 +478,12 @@ class VehiculoApp {
         }
         
         try {
-            setButtonLoading('syncBtn', true);
+            // Cambiar texto del botón de sincronización
+            const syncBtn = document.getElementById('syncBtn');
+            const originalHTML = syncBtn.innerHTML;
+            syncBtn.innerHTML = '<span class="material-icons">hourglass_empty</span> Sincronizando...';
+            syncBtn.disabled = true;
+            
             const success = await githubDB.sincronizar();
             
             if (success) {
@@ -500,7 +505,10 @@ class VehiculoApp {
             console.error('Error en sincronización:', error);
             showToast('❌ Error al sincronizar', 'error');
         } finally {
-            setButtonLoading('syncBtn', false);
+            // Restaurar botón de sincronización
+            const syncBtn = document.getElementById('syncBtn');
+            this.updateSyncStatus(); // Esto restaurará el texto correcto del botón
+            syncBtn.disabled = false;
         }
     }
 
@@ -544,13 +552,22 @@ class VehiculoApp {
         }
         
         try {
-            setButtonLoading('githubTokenForm', true);
+            // Cambiar texto del botón en lugar de usar setButtonLoading
+            const submitBtn = document.querySelector('#githubTokenForm button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Configurando...';
+            submitBtn.disabled = true;
+            
+            console.log('🔧 Configurando token GitHub...');
             
             // Configurar el token
             githubDB.setToken(token);
+            console.log('✅ Token configurado en githubDB');
             
             // Probar el token haciendo una sincronización
+            console.log('🔄 Probando token con sincronización...');
             const success = await githubDB.sincronizar();
+            console.log('📊 Resultado sincronización:', success);
             
             if (success) {
                 showToast('✅ Token configurado correctamente', 'success');
@@ -583,7 +600,10 @@ class VehiculoApp {
                 showToast('❌ Error al configurar token', 'error');
             }
         } finally {
-            setButtonLoading('githubTokenForm', false);
+            // Restaurar botón
+            const submitBtn = document.querySelector('#githubTokenForm button[type="submit"]');
+            submitBtn.textContent = 'Configurar';
+            submitBtn.disabled = false;
         }
     }
 
