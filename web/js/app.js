@@ -146,18 +146,26 @@ class VehiculoApp {
         
         try {
             if (isRegistering) {
+                console.log('🔄 Iniciando proceso de registro...');
                 const user = await db.registrarUsuario(nombre, email, password);
+                console.log('📝 Resultado del registro:', user);
                 if (user) {
                     this.currentUser = user;
+                    // Guardar usuario actual en localStorage después del registro
+                    localStorage.setItem('vehiculo_current_user', JSON.stringify(user));
+                    console.log('✅ Usuario asignado a currentUser y guardado en localStorage:', this.currentUser);
                     showToast('Cuenta creada exitosamente', 'success');
                     this.showMainScreen();
                 } else {
                     showToast('El email ya está registrado', 'error');
                 }
             } else {
+                console.log('🔄 Iniciando proceso de login...');
                 const user = await db.login(email, password);
+                console.log('📝 Resultado del login:', user);
                 if (user) {
                     this.currentUser = user;
+                    console.log('✅ Usuario asignado a currentUser:', this.currentUser);
                     showToast(`Bienvenido, ${user.nombre}`, 'success');
                     this.showMainScreen();
                 } else {
