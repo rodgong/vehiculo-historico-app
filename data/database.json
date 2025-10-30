@@ -448,9 +448,33 @@
       "fecha": "2025-10-28T23:00:00.000Z",
       "nombreUsuario": "Rod1",
       "fechaCreacion": "2025-10-30T11:47:45.108Z"
+    },
+    {
+      "id": 1761824990092,
+      "vehiculoId": 1761824858308,
+      "usuarioId": 1761824915821,
+      "fecha": "2025-10-27T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:49:50.092Z"
+    },
+    {
+      "id": 1761825028980,
+      "vehiculoId": 1761824858308,
+      "usuarioId": 1761824915821,
+      "fecha": "2025-10-26T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:50:28.980Z"
+    },
+    {
+      "id": 1761825080676,
+      "vehiculoId": 1761824858308,
+      "usuarioId": 1761824915821,
+      "fecha": "2025-10-25T22:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:51:20.676Z"
     }
   ],
   "compartidos": [],
-  "lastSync": "2025-10-30T11:48:22.546Z",
+  "lastSync": "2025-10-30T11:51:25.220Z",
   "version": "1.0"
 }
