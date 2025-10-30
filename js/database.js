@@ -307,9 +307,27 @@ class VehiculoDatabase {
             .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     }
 
-    agregarDiaUso(vehiculoId, usuarioId, fecha) {
+    async agregarDiaUso(vehiculoId, usuarioId, fecha) {
         const diasUso = this.getDiasUso();
         const fechaStr = fecha.toISOString().split('T')[0];
+        
+        console.log('🔍 DEBUG agregarDiaUso:', {
+            vehiculoId,
+            vehiculoIdType: typeof vehiculoId,
+            usuarioId,
+            usuarioIdType: typeof usuarioId,
+            fechaStr,
+            totalDiasUso: diasUso.length,
+            diasParaEsteVehiculo: diasUso.filter(d => d.vehiculoId === vehiculoId).length,
+            todosLosDiasUso: diasUso.map(d => ({
+                id: d.id,
+                vehiculoId: d.vehiculoId,
+                vehiculoIdType: typeof d.vehiculoId,
+                usuarioId: d.usuarioId,
+                fecha: d.fecha.split('T')[0],
+                nombreUsuario: d.nombreUsuario
+            }))
+        });
         
         // Verificar si ya existe un día de uso para este vehículo en esta fecha (por cualquier usuario)
         const existente = diasUso.find(d => 
@@ -318,6 +336,14 @@ class VehiculoDatabase {
         );
         
         if (existente) {
+            console.log('❌ Día existente encontrado:', {
+                existenteId: existente.id,
+                existenteUsuarioId: existente.usuarioId,
+                existenteNombreUsuario: existente.nombreUsuario,
+                existenteFecha: existente.fecha,
+                usuarioActual: usuarioId
+            });
+            
             // Si existe, verificar si es del mismo usuario
             if (existente.usuarioId === usuarioId) {
                 return { error: 'duplicate', message: 'Ya registraste este día' };
@@ -325,14 +351,31 @@ class VehiculoDatabase {
                 return { error: 'occupied', message: `Este día ya fue usado por ${existente.nombreUsuario}` };
             }
         }
+        
+        console.log('✅ No hay conflictos, agregando día de uso');
 
-        // Obtener el nombre del usuario por ID en lugar de getCurrentUser
-        const usuarios = this.getUsuarios();
-        const usuario = usuarios.find(u => u.id === usuarioId);
+        // Obtener el nombre del usuario por ID - buscar en ambas bases de datos
+        let usuario = null;
+        
+        // Primero buscar en localStorage
+        const usuariosLocales = this.getUsuarios();
+        usuario = usuariosLocales.find(u => u.id === usuarioId);
+        
+        // Si no se encuentra localmente y tenemos GitHub DB, buscar ahí
+        if (!usuario && this.githubDB && this.githubDB.initialized) {
+            try {
+                const githubData = await this.githubDB.getData();
+                usuario = githubData.usuarios.find(u => u.id === usuarioId);
+                console.log('👤 Usuario encontrado en GitHub Database:', usuario?.nombre);
+            } catch (error) {
+                console.error('Error buscando usuario en GitHub:', error);
+            }
+        }
         
         if (!usuario) {
-            console.error('Usuario no encontrado:', usuarioId);
-            return false;
+            console.error('Usuario no encontrado en ninguna base de datos:', usuarioId);
+            console.log('Usuarios locales:', usuariosLocales.map(u => ({ id: u.id, nombre: u.nombre })));
+            return { error: 'user_not_found', message: 'Usuario no encontrado' };
         }
 
         const nuevoDiaUso = {
@@ -363,3 +406,13 @@ class VehiculoDatabase {
 
 // Instancia global de la base de datos
 const db = new VehiculoDatabase();
+
+// Función de debug para diagnosticar problemas
+window.debugVehiculos = function() {
+    console.log('=== DEBUG VEHICULOS ===');
+    console.log('Usuario actual:', db.getCurrentUser());
+    console.log('Todos los vehículos:', db.getVehiculos());
+    console.log('Vehículos compartidos:', db.getVehiculosCompartidos());
+    console.log('Todos los días de uso:', db.getDiasUso());
+    console.log('======================');
+};

@@ -329,9 +329,9 @@ class VehiculoApp {
         showModal('vehiculoSelectorModal');
     }
 
-    agregarDiaHoy(vehiculoId) {
+    async agregarDiaHoy(vehiculoId) {
         try {
-            const result = db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
+            const result = await db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
             if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
@@ -341,16 +341,17 @@ class VehiculoApp {
                 showToast('Ya existe un registro para hoy', 'warning');
             }
         } catch (error) {
+            console.error('Error al agregar día de uso:', error);
             showToast('Error al agregar día de uso', 'error');
         }
         closeModal();
     }
 
-    agregarDiaFecha(vehiculoId) {
+    async agregarDiaFecha(vehiculoId) {
         if (!this.selectedDate) return;
         
         try {
-            const result = db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
+            const result = await db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
             if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
@@ -363,6 +364,7 @@ class VehiculoApp {
                 showToast('Ya existe un registro para esta fecha', 'warning');
             }
         } catch (error) {
+            console.error('Error al agregar día de uso:', error);
             showToast('Error al agregar día de uso', 'error');
         }
         closeModal();
