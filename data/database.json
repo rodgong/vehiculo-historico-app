@@ -448,9 +448,25 @@
       "fecha": "2025-10-28T23:00:00.000Z",
       "nombreUsuario": "Rod1",
       "fechaCreacion": "2025-10-30T11:38:48.396Z"
+    },
+    {
+      "id": 1761824425764,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824376429,
+      "fecha": "2025-10-27T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:40:25.764Z"
+    },
+    {
+      "id": 1761824451812,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824376429,
+      "fecha": "2025-10-26T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:40:51.812Z"
     }
   ],
   "compartidos": [],
-  "lastSync": "2025-10-30T11:39:23.586Z",
+  "lastSync": "2025-10-30T11:40:57.583Z",
   "version": "1.0"
 }
