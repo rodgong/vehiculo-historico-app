@@ -380,6 +380,16 @@
       "compartido": false,
       "codigoCompartido": null,
       "fechaCreacion": "2025-10-30T14:23:58.908Z"
+    },
+    {
+      "id": 1761834542572,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761834532373,
+      "compartido": false,
+      "codigoCompartido": null,
+      "fechaCreacion": "2025-10-30T14:29:02.572Z"
     }
   ],
   "diasUso": [
@@ -950,9 +960,25 @@
       "fecha": "2025-10-30T14:24:00.988Z",
       "nombreUsuario": "Rod1",
       "fechaCreacion": "2025-10-30T14:24:00.988Z"
+    },
+    {
+      "id": 1761834544844,
+      "vehiculoId": 1761834542572,
+      "usuarioId": 1761834532373,
+      "fecha": "2025-10-30T14:29:04.844Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T14:29:04.844Z"
+    },
+    {
+      "id": 1761834549620,
+      "vehiculoId": 1761834542572,
+      "usuarioId": 1761834532373,
+      "fecha": "2025-10-28T23:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T14:29:09.620Z"
     }
   ],
   "compartidos": [],
-  "lastSync": "2025-10-30T14:26:57.348Z",
+  "lastSync": "2025-10-30T14:29:54.324Z",
   "version": "1.0"
 }
