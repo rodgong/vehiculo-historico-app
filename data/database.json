@@ -210,6 +210,56 @@
       "compartido": false,
       "codigoCompartido": null,
       "fechaCreacion": "2025-10-30T11:54:15.748Z"
+    },
+    {
+      "id": 1761823895356,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761823885092,
+      "compartido": false,
+      "codigoCompartido": null,
+      "fechaCreacion": "2025-10-30T11:31:35.356Z"
+    },
+    {
+      "id": 1761824279836,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761824270805,
+      "compartido": false,
+      "codigoCompartido": null,
+      "fechaCreacion": "2025-10-30T11:37:59.836Z"
+    },
+    {
+      "id": 1761825610124,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761825604580,
+      "compartido": false,
+      "codigoCompartido": null,
+      "fechaCreacion": "2025-10-30T12:00:10.124Z"
+    },
+    {
+      "id": 1761825749324,
+      "nombre": "Lada Niva",
+      "marca": "Lada",
+      "modelo": "Niva",
+      "usuarioId": 1761825740580,
+      "compartido": true,
+      "codigoCompartido": "UZJZDQER",
+      "fechaCreacion": "2025-10-30T12:02:29.324Z"
+    },
+    {
+      "id": 1761825768244,
+      "nombre": "moto",
+      "marca": "m",
+      "modelo": "m",
+      "usuarioId": 1761825730404,
+      "compartido": true,
+      "codigoCompartido": "U8UDBTKT",
+      "fechaCreacion": "2025-10-30T12:02:48.244Z"
     }
   ],
   "diasUso": [
@@ -492,9 +542,153 @@
       "fecha": "2025-10-25T22:00:00.000Z",
       "nombreUsuario": "Rod2",
       "fechaCreacion": "2025-10-30T11:51:20.676Z"
+    },
+    {
+      "id": 1761824284260,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824270805,
+      "fecha": "2025-10-30T11:38:04.260Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T11:38:04.260Z"
+    },
+    {
+      "id": 1761824328396,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824270805,
+      "fecha": "2025-10-28T23:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T11:38:48.396Z"
+    },
+    {
+      "id": 1761824425764,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824376429,
+      "fecha": "2025-10-27T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:40:25.764Z"
+    },
+    {
+      "id": 1761824451812,
+      "vehiculoId": 1761824279836,
+      "usuarioId": 1761824376429,
+      "fecha": "2025-10-26T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T11:40:51.812Z"
+    },
+    {
+      "id": 1761825612172,
+      "vehiculoId": 1761825610124,
+      "usuarioId": 1761825604580,
+      "fecha": "2025-10-30T12:00:12.172Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:00:12.172Z"
+    },
+    {
+      "id": 1761825617972,
+      "vehiculoId": 1761825610124,
+      "usuarioId": 1761825604580,
+      "fecha": "2025-10-28T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:00:17.972Z"
+    },
+    {
+      "id": 1761825751028,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-30T12:02:31.028Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:02:31.028Z"
+    },
+    {
+      "id": 1761825756060,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-28T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:02:36.060Z"
+    },
+    {
+      "id": 1761825770508,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-30T12:02:50.508Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:02:50.508Z"
+    },
+    {
+      "id": 1761825775348,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-28T23:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:02:55.348Z"
+    },
+    {
+      "id": 1761825787628,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-26T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:03:07.628Z"
+    },
+    {
+      "id": 1761825802340,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-27T23:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:03:22.340Z"
+    },
+    {
+      "id": 1761825853916,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-27T23:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:04:13.916Z"
+    },
+    {
+      "id": 1761825908388,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-26T23:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:05:08.388Z"
+    },
+    {
+      "id": 1761826072548,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-25T22:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:07:52.548Z"
+    },
+    {
+      "id": 1761826088996,
+      "vehiculoId": 1761825749324,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-24T22:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:08:08.996Z"
+    },
+    {
+      "id": 1761826105468,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825740580,
+      "fecha": "2025-10-25T22:00:00.000Z",
+      "nombreUsuario": "Rod2",
+      "fechaCreacion": "2025-10-30T12:08:25.468Z"
+    },
+    {
+      "id": 1761826119716,
+      "vehiculoId": 1761825768244,
+      "usuarioId": 1761825730404,
+      "fecha": "2025-10-24T22:00:00.000Z",
+      "nombreUsuario": "Rod1",
+      "fechaCreacion": "2025-10-30T12:08:39.716Z"
     }
   ],
   "compartidos": [],
-  "lastSync": "2025-10-30T12:09:12.216Z",
+  "lastSync": "2025-10-30T12:09:53.852Z",
   "version": "1.0"
 }
