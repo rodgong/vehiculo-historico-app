@@ -33,18 +33,22 @@ class VehiculoDatabase {
     }
 
     async registrarUsuario(nombre, email, password) {
-        // Usar GitHub Database para registro
-        if (this.githubDB && this.githubDB.initialized) {
-            const { hash, salt } = await SecurityUtils.hashPasswordWithSalt(password);
-            return await this.githubDB.registrarUsuario(nombre, email, hash, salt);
+        // Primero verificar en localStorage si el usuario ya existe
+        const usuariosLocales = this.getUsuarios();
+        if (usuariosLocales.find(u => u.email === email)) {
+            return null;
         }
         
-        // Fallback a localStorage
-        const usuarios = this.getUsuarios();
-        
-        // Verificar si el email ya existe
-        if (usuarios.find(u => u.email === email)) {
-            return null;
+        // También verificar en GitHub Database si está disponible
+        if (this.githubDB && this.githubDB.initialized) {
+            try {
+                const githubData = await this.githubDB.getData();
+                if (githubData.usuarios.find(u => u.email === email)) {
+                    return null; // Usuario ya existe en GitHub
+                }
+            } catch (error) {
+                console.log('No se pudo verificar en GitHub Database:', error);
+            }
         }
 
         // Hash de la contraseña con salt
@@ -59,8 +63,20 @@ class VehiculoDatabase {
             fechaRegistro: new Date().toISOString()
         };
 
-        usuarios.push(nuevoUsuario);
-        this.saveUsuarios(usuarios);
+        // SIEMPRE registrar en localStorage primero
+        usuariosLocales.push(nuevoUsuario);
+        this.saveUsuarios(usuariosLocales);
+        console.log('✅ Usuario registrado en localStorage:', nombre);
+
+        // Intentar sincronizar con GitHub Database si es posible
+        if (this.githubDB && this.githubDB.initialized && !this.githubDB.readOnly) {
+            try {
+                await this.githubDB.registrarUsuario(nombre, email, hash, salt);
+                console.log('✅ Usuario sincronizado con GitHub Database:', nombre);
+            } catch (error) {
+                console.log('⚠️ No se pudo sincronizar con GitHub Database:', error);
+            }
+        }
         
         // Retornar usuario sin datos sensibles
         const { passwordHash, passwordSalt, ...userSafe } = nuevoUsuario;
@@ -69,18 +85,7 @@ class VehiculoDatabase {
 
     async login(email, password) {
         try {
-            // Usar GitHub Database para login si está disponible
-            if (this.githubDB && this.githubDB.initialized) {
-                console.log('🌐 Intentando login con GitHub Database...');
-                const result = await this.githubDB.login(email, password);
-                if (result) {
-                    console.log('🎉 Login exitoso con GitHub Database');
-                    return result;
-                }
-                console.log('⚠️ Login fallido en GitHub, intentando local...');
-            }
-
-            // Fallback a localStorage
+            // PRIMERO intentar login con localStorage (más rápido y confiable)
             const usuarios = this.getUsuarios();
             console.log('🔍 Intento de login local para:', email);
             console.log('📊 Total usuarios locales:', usuarios.length);
