@@ -331,10 +331,12 @@ class VehiculoApp {
 
     agregarDiaHoy(vehiculoId) {
         try {
-            const success = db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
-            if (success) {
+            const result = db.agregarDiaUso(vehiculoId, this.currentUser.id, new Date());
+            if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
+            } else if (result && result.error) {
+                showToast(result.message, 'warning');
             } else {
                 showToast('Ya existe un registro para hoy', 'warning');
             }
@@ -348,13 +350,15 @@ class VehiculoApp {
         if (!this.selectedDate) return;
         
         try {
-            const success = db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
-            if (success) {
+            const result = db.agregarDiaUso(vehiculoId, this.currentUser.id, this.selectedDate);
+            if (result === true) {
                 showToast('Día de uso agregado', 'success');
                 this.loadVehiculos();
                 if (this.currentVehiculo && this.currentVehiculo.id === vehiculoId) {
                     this.loadVehiculoDetail();
                 }
+            } else if (result && result.error) {
+                showToast(result.message, 'warning');
             } else {
                 showToast('Ya existe un registro para esta fecha', 'warning');
             }

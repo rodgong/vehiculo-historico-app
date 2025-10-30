@@ -311,14 +311,19 @@ class VehiculoDatabase {
         const diasUso = this.getDiasUso();
         const fechaStr = fecha.toISOString().split('T')[0];
         
-        // Verificar si ya existe un día de uso para esta fecha
+        // Verificar si ya existe un día de uso para este vehículo en esta fecha (por cualquier usuario)
         const existente = diasUso.find(d => 
             d.vehiculoId === vehiculoId && 
             d.fecha.split('T')[0] === fechaStr
         );
         
         if (existente) {
-            return false; // Ya existe
+            // Si existe, verificar si es del mismo usuario
+            if (existente.usuarioId === usuarioId) {
+                return { error: 'duplicate', message: 'Ya registraste este día' };
+            } else {
+                return { error: 'occupied', message: `Este día ya fue usado por ${existente.nombreUsuario}` };
+            }
         }
 
         // Obtener el nombre del usuario por ID en lugar de getCurrentUser
